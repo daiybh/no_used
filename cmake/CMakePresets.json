@@ -1,0 +1,148 @@
+﻿{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "base",
+      "description": "For more information: http://aka.ms/cmakepresetsvs",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "installDir": "${sourceDir}/out/install/${presetName}",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "environment": {
+        "VCPKG_FEATURE_FLAGS": "manifests,versions,binarycaching,registries"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "x64-debug",
+      "displayName": "x64 Debug",
+      "description": "Sets debug build type and x64 arch",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+          "CMAKE_C_COMPILER": "cl.exe",
+          "CMAKE_CXX_COMPILER": "cl.exe",
+          "VCPKG_TARGET_TRIPLET": "x64-windows-static-md"
+        }
+    },
+    {
+      "name": "x64-release",
+      "displayName": "x64 Release",
+      "description": "Sets release build type",
+      "inherits": "x64-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },    
+    {
+      "name": "linux-debug",
+      "displayName": "Linux Debug",
+      "description": "Linux Debug build type. Sets GCC",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++",        
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+          "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}",
+          "copyAdditionalIncludeDirectoriesList": [ "$env{HOME}/.vs/box2d-lite-actions/out/build/linux-debug/vcpkg_installed/x64-linux/include" ]
+        }
+      }
+    },
+    {
+      "name": "linux-release",
+      "displayName": "Linux Release",
+      "description": "Sets release build type with GCC",
+      "inherits": "linux-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [    
+    {
+      "name": "build-linux-debug",
+      "displayName": "build-linux-debug",
+      "configurePreset": "linux-debug",
+      "description": "Vanilla build"
+    },
+    {
+      "name": "build-linux-debug-install",
+      "displayName": "build and install linux-debug",
+      "inherits": "build-linux-debug",
+      "description": "build and install ",
+      "targets":["install"]
+    },
+    {
+      "name": "build-linux-release",
+      "displayName": "build-linux-release",
+      "configurePreset": "linux-release",
+      "description": "Vanilla build"
+    },
+    {
+      "name": "build-linux-release-install",
+      "displayName": "build and install linux-release",
+      "inherits": "build-linux-release",
+      "description": "build and install",
+      "targets":["install"]
+    },
+    {
+      "name": "build-windows-debug",
+      "displayName": "build-windows-debug",
+      "configurePreset": "x64-debug",
+      "description": "Vanilla build"
+    },
+    {
+      "name": "build-windows-debug-install",
+      "displayName": "build-install-windows-debug",
+      "inherits": "build-windows-debug",
+      "description": "build and install",
+      "targets":["install"]
+    },
+    {
+      "name": "build-windows-release",
+      "displayName": "build-windows-release",
+      "configurePreset": "x64-release",
+      "description": "Vanilla build"
+    },
+    {
+      "name": "build-windows-release-install",
+      "displayName": "build-install-windows-release",
+      "inherits": "build-windows-release",
+      "description": "build and install",
+      "targets":["install"]
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "core-test-linux",
+      "description": "Enable output on failure",
+      "configurePreset": "linux-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "core-test-windows",
+      "inherits": "core-test-linux",
+      "configurePreset": "x64-debug"
+    }
+  ]
+}
